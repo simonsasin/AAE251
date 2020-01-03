@@ -1,0 +1,180 @@
+units = input('What unit type will you be using? ','s');
+%conitional statement to decide which system to use for
+calculations
+if strcmp(units, 'English')
+%user inputs for range, payload weight and engine type
+range = input('What is the range of you aircraft? ');
+p_weight = input('What is the payload weight of your
+aircraft? ');
+engine = input('What is the engine type of your aircraft?
+','s');
+M = input('What is the Mach number your aircraft will
+travel at? ');
+%assign user input for engine to correct cruise and loiter
+specific fuel
+%consumptions
+if strcmp(engine, 'Pure turbojet')
+C = 0.9;
+L = 0.8;
+elseif strcmp(engine, 'Low-bypass turbofan')
+C = 0.8;
+L = 0.7;
+elseif strcmp(engine, 'High-bypass turbofan')
+C = 0.5;
+L = 0.4;
+elseif strcmp(engine,'Piston-prop (fixed pitch)')
+C = 0.4;
+L = 0.5;
+elseif strcmp(engine, 'Piston-prop (variable pitch)')
+C = 0.4;
+L = 0.5;
+elseif strcmp(engine, 'Turboprop')
+C = 0.5;
+L = 0.6;
+end
+%Warmup and takeoff mission segment calculations
+W1_Wo = 0.97;
+%Climb mission segment calculations
+W2_W1 = 0.985;
+%Cruise mission segment calculations
+R = range*6076; %convert Nm to feet for range
+C = C/3600; %convert C from per hour to per sec for
+specific fuel consumption
+
+15
+
+V = M * (994.8); %convert mach # to ft/s for velocity
+LD = 16 * .866; %Jet engine by higher velocity yielding for
+jet engines only
+W3_W2 = exp((-R*C)/(V*LD)); %ASW calculation for W2 to W3
+%Loiter mission segment calculations
+E = 3 * 3600; %seconds loiter time convert from 3 hours
+L = L / 3600; %convert from hours to seconds for cruise
+velocity yielding
+LD = 16;
+W4_W3 = exp((-E*L)/(LD));
+%Cruise (same as cruise above)
+W5_W4 = W3_W2;
+%Loiter
+E = (1/3) * 3600; %convert from 1/3 hour to seconds for FAA
+required fuel amount for loiter time
+LD = 16;
+W6_W5 = exp((-E*L)/LD);
+%Landing mission segment calculation
+W7_W6 = 0.995; %retreived from table 3.2
+W7_Wo =
+(W1_Wo)*(W2_W1)*(W3_W2)*(W4_W3)*(W5_W4)*(W6_W5)*(W7_W6);
+Wf_Wo = 1.06*(1 - W7_Wo);
+%while loop to bring difference between W_o guess and W_o
+calculated to a
+%minimal difference
+Wo_guess = 50000.00; %initial guess for W_o
+W_c = 800; %weight of crew from Raymen
+Wo_calc = 57000.00; %initial W_o calc estimation
+Wo_approx = 0; %variable initialization for W_o final
+approximation
+while abs(Wo_guess - Wo_calc) > 2
+We_Wo = .93*(Wo_guess)^(-.07)
+Wo_calc = (p_weight + W_c)/(1-Wf_Wo-We_Wo)
+if Wo_calc > Wo_guess
+Wo_guess = Wo_guess + 1
+elseif Wo_calc < Wo_guess
+Wo_guess = Wo_guess - 1
+end
+end
+Wo_approx = Wo_guess
+%We_Wo ratio used for final gross vehicle takeoff weight
+calculation
+We_Wo = 0.93*(Wo_approx^(-.07));
+
+16
+
+%Calculate gross vehicle takeoff weight
+W_o = (p_weight + W_c)/(1 - Wf_Wo - We_Wo);
+elseif strcomp(units, 'Metric')
+%user inputs for range, payload weight and engine type
+range = input('What is the range of you aircraft? ');
+p_weight = input('What is the payload weight of your
+aircraft? ');
+engine = input('What is the engine type of your aircraft?
+','s');
+M = input('What is the Mach number your aircraft will
+travel at? ');
+%assign user input for engine to correct cruise and loiter
+specific fuel
+%consumptions
+if strcmp(engine, 'Pure turbojet')
+C = 25.5;
+L = 22.7;
+elseif strcmp(engine, 'Low-bypass turbofan')
+C = 22.7;
+L = 19.8;
+elseif strcmp(engine, 'High-bypass turbofan')
+C = 14.1;
+L = 11.3;
+elseif strcmp(engine,'Piston-prop (fixed pitch)')
+C = .068;
+L = .085;
+elseif strcmp(engine, 'Piston-prop (variable pitch)')
+C = .068;
+L = .085;
+elseif strcmp(engine, 'Turboprop')
+C = .085;
+L = 0.101;
+end
+%Warmup and takeoff mission segment calculations
+W1_Wo = 0.97;
+%Climb mission segment calculations
+W2_W1 = 0.985;
+%Cruise mission segment calculations
+R = range*1852; %convert Nm to meters for range
+C = C / 3600; %convert C from per hour to per sec for
+specific fuel consumption
+V = M * (343); %convert mach # to m/s for velocity
+LD = 16 * .866; %Jet engine by higher velocity yielding for
+jet engines only
+
+17
+W3_W2 = exp((-R*C)/(V*LD)); %ASW calculation for W2 to W3
+%Loiter mission segment calculations
+E = 3 * 3600; %seconds loiter time convert from 3 hours
+L = L / 3600; %convert from hours to seconds for cruise
+velocity yielding
+LD = 16;
+W4_W3 = exp((-E*L)/(LD));
+%Cruise (same as cruise above)
+W5_W4 = W3_W2;
+%Loiter
+E = (1/3) * 3600; %convert from 1/3 hour to seconds for FAA
+required fuel amount for loiter time
+LD = 16;
+W6_W5 = exp((-E*L)/LD);
+%Landing mission segment calculation
+W7_W6 = 0.995; %retreived from table 3.2
+W7_Wo =
+(W1_Wo)*(W2_W1)*(W3_W2)*(W4_W3)*(W5_W4)*(W6_W5)*(W7_W6);
+Wf_Wo = 1.06*(1 - W7_Wo);
+%while loop to bring difference between W_o guess and W_o
+calculated to a
+%minimal difference
+Wo_guess = 50000.00; %initial guess for W_o
+W_c = 800 * .43592; %weight of crew from Raymen convert
+from pounds to kg
+Wo_calc = 57000.00; %initial W_o calc estimation
+Wo_approx = 0; %variable initialization for W_o final
+approximation
+while abs(Wo_guess - Wo_calc) > 2
+We_Wo = .93*(Wo_guess)^(-.07)
+Wo_calc = (p_weight + W_c)/(1-Wf_Wo-We_Wo)
+if Wo_calc > Wo_guess
+Wo_guess = Wo_guess + 1
+elseif Wo_calc < Wo_guess
+Wo_guess = Wo_guess - 1
+end
+end
+Wo_approx = Wo_guess;
+%We_Wo ratio used for final gross vehicle takeoff weight
+calculation
+We_Wo = 0.93*(Wo_approx^(-.07));
+%Calculate gross vehicle takeoff weight
+W_o = (p_weight + W_c)/(1 - Wf_Wo - We_Wo);
