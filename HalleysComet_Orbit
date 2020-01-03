@@ -1,0 +1,23 @@
+eccentricity_comet = 0.9671429; %eccentricity of haleys comet
+orbit
+eccentricity_earth = 0.0167; %eccentricity of earth orbit
+a_comet = 17.834144; % semimajor axis of ellipse comet orbit
+a_earth = 1; %semimajor axis of ellipse earth orbit
+true_anomaly = 0:.01:2*pi; %range of radian values for true
+anomaly
+%calculation for r for earth and comet based off of true anomaly
+and above
+%constant
+r_comet = (a_comet*(1 - (eccentricity_comet^2)))./(1 +
+(eccentricity_comet*cos(true_anomaly)));
+r_earth = (a_earth*(1 - (eccentricity_earth^2))) ./(1 +
+(eccentricity_earth*cos(true_anomaly)));
+%both earth and comet are orbiting around earth
+r_sun = 0;
+theta_sun = 0;
+%polar coordinate plot of all 4 parameters to plot orbital
+trajectories
+polarplot(true_anomaly,r_comet, '-', true_anomaly, r_earth,'-g',
+theta_sun, r_sun, '*r')
+title('Plot of Trajectory of Haleys Comet & Earth About Sun')
+legend('Haleys Orbit','Earth Orbit', 'Sun')
