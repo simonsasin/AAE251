@@ -1,0 +1,64 @@
+%Simon Sasin
+%11-30-2019
+%Final Project Multi-Rocket Sizing Code
+
+
+%create array for all possible values of f1
+f1 = .3:.1:.55
+%initialize value of required deltav
+delta_v = 7800 %m/s
+%m_pay is initialized
+m_pay = 5 %kg payload mass
+%calculation of deltav 
+delta_v1 = f1*delta_v
+%calculation of delta v2 for second stage
+delta_v2 = (1-f1)*delta_v
+Isp_1 = 260 %specific impulse for stage 1
+Isp_2 = 290 %specific impulse for stage 2
+g_0 = 9.81 %ms^-2 gravity
+c_1 = Isp_1*g_0 %exhaust velocity of stage 1
+c_2 = Isp_2*g_0 %exhaust velocity of stage 2
+
+m_initialarray = zeros(1,26)
+finert_1 = zeros(1,26)
+finert_2 = zeros(1,26)
+f1_initial = .3
+f1 = zeros(1,26)
+first = .06
+for count = 1:26
+    
+    finert_1(count) = first
+    finert_2(count) = first
+    f1(count) = f1_initial
+    delta_v1 = f1(count)*delta_v
+    delta_v2 = (1-f1(count))*delta_v
+    first =+ .005
+    f1_initial =+ .001
+
+%calculation of numerators and denominators to simply final initial mass
+%calculation
+num_1 = exp(delta_v2./c_2).*(1-finert_2(count)) 
+num_2 = exp(delta_v1./c_1).*(1-finert_1(count))
+den_1 =1-(finert_2(count).*exp(delta_v2./c_2))
+den_2 =1-(finert_1(count).*exp(delta_v1./c_1))
+
+%final m_initial calculation for each deltav
+m_initial = m_pay*(num_1./den_1).*(num_2./den_2)
+%finding where mass intial is minimized
+min = islocalmin(m_initial);
+f2 = f1(min) - 1;
+
+%final plot with labels and legend
+plot(f1,m_initial,'-g')
+hold on
+xlabel('f1')
+ylabel('Initial Vehicle Mass (kg)')
+title('Initial Vehicle Mass vs. f1')
+plot(f1(min),m_initial(min),'*b')
+legend('Initial Vehicle Mass Line','Minimum Initial Mass at f1 = .42 ')
+hold off
+
+m_initialarray(count) = m_initial
+end
+
+fprintf("The f1 value where initial mass of stage one is a minimum is ", f1(min)) 
