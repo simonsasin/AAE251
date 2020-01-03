@@ -1,0 +1,190 @@
+hw1.m
+Last month
+Dec 15, 2019
+s
+You uploaded an item
+Objective C
+hw1.m
+altitude = zeros(32,1);
+altitude_initial = 0;
+
+%create array to store all altitude data
+for count = 2:32
+    altitude(count) = altitude_initial + 1;
+    altitude_initial = altitude(count);
+    
+end
+
+%altitude vs. temperature plot macro
+temp_array = zeros(32,1);
+
+%temperature calculation for gradient layer
+temp_sealevel = 288.16; %kelvin at sea level
+a_1 = -6.5; %lapse rate for gradient layer (K/km)
+
+for gradient = 1:12
+    temp_gradient = altitude(gradient)*a_1 + temp_sealevel;
+    temp_array(gradient) = temp_gradient;
+end 
+
+%temperature calculation for isothermal layer
+temp_constant_isothermal = temp_array(12); %constant temp in isothermal layer
+
+for isothermal = 12:26
+    temp_array(isothermal) = temp_constant_isothermal;
+end
+
+%temperature calculation for 2nd gradient region
+a_2 = 3; %K/km constant for calculation
+temp_initial = temp_array(26);
+h_initial = altitude(26); %km for initial height
+
+for gradient_2 = 26:32
+    temp_gradient_2 = (altitude(gradient_2) - h_initial)*a_2 + temp_initial;;
+    temp_array(gradient_2) = temp_gradient_2;
+end
+
+%altitude versus pressure macro
+pressure_array = zeros(32,1);
+
+%pressure calculation for first gradient region
+P_initial = 101325; %N/m^2 constant use for pressure at sea level
+g_o = 9.81; %m/s^2 constant for gravity
+R = 287; %J/kg*K gas constant
+temp_sealevel = 288.16; %kelvin at sea level
+a_1 = -.0065; %K/m constant for temperature gradient
+
+for count = 1:12
+    pressure = (((temp_array(count))/temp_sealevel)^(-g_o/(a_1*R)))*P_initial;
+    pressure_array(count) = pressure;
+end
+
+%pressure calculation for isothermal layer
+P_initial = pressure_array(12); %N/m^2 pressure used from last calculation
+g_o = 9.81; %m/s^2 constant for gravity
+R = 287; %J/kg*K gas constant
+temp_constant_isothermal = 216.66; %kelvin constant 
+altitude_initial = 11000; %meters for initial altitude
+
+for count = 12:26
+    pressure = P_initial*exp(-1*((g_o/(R*temp_array(count)))*((altitude(count)*1000)- altitude_initial)));
+    pressure_array(count) = pressure;
+end
+
+%pressure calculation for second gradient layer
+
+for count = 26:32
+    pressure = 5474.889 * [216.65/(216.65 + (altitude(count) - 20))]^34.1632;
+    pressure_array(count) = pressure;
+end
+
+% altitude vs. density macro
+density_array = zeros(32,1); %establish array to store density values
+
+%density calculations for gradient layer
+rho_initial = 1.2250; %kg/m^3 constant use for density at sea level
+g_o = 9.81; %m/s^2 constant for gravity
+R = 287; %J/kg*K gas constant
+temp_sealevel = 288.16; %kelvin at sea level
+a_1 = -.0065; %K/m constant for temperature gradient
+
+for count = 1:12
+    density = ((temp_array(count))/temp_sealevel)^(-1*(((g_o/(a_1*R))+1)))*rho_initial;
+    density_array(count) = density;
+end
+
+%density calculations for isothermal layer
+rho_initial = density_array(12); %kg/m^3 constant use for density at sea level
+g_o = 9.81; %m/s^2 constant for gravity
+R = 287; %J/kg*K gas constant
+temp_initial = temp_array(12); %initial temp for beginning of isothermal layer
+altitude_initial = 11000; %initial altitude for isothermal layer
+
+for count = 12:26
+    density = (rho_initial)*exp(-1*(g_o/(R*temp_array(count)))*((altitude(count)*1000) - altitude_initial));
+    density_array(count) = density;
+end
+
+%density calculations for second gradient layer
+rho_initial = density_array(26); %kg/m^3 constant use for density at sea level
+g_o = 9.81; %m/s^2 constant for gravity
+R = 287; %J/kg*K gas constant
+temp_initial = temp_array(26); %kelvin at sea level
+a_2 = -.003; %K/m constant for temperature gradient
+pressure_initial = pressure_array(26);
+
+for count = 26:32
+    density = (pressure_array(count)/pressure_initial)*rho_initial;
+    density_array(count) = density;
+end
+
+%calculation for speed of sound at each altitude
+R = 287; %J/kg*K gas constant
+y = 1.4; %bolztmann constant air at STP
+
+sound_array = zeros(32,1);
+
+for count = 1:32
+    speed_sound = nthroot((y*R*temp_array(count)),2);
+    sound_array(count) = speed_sound;
+end
+    
+%code for plotting all graphs
+
+%convert all metric units to english units for conversion
+altitude_english = arrayfun(@(x) x*3280.8399,altitude); 
+density_array_english = arrayfun(@(x) x*.00194032033,density_array);
+pressure_array_english = arrayfun(@(x) x*.020885,pressure_array);
+sound_array_english = arrayfun(@(x) x*3.28084,sound_array);
+
+%plot altitude vs. temp, pressure, density and the speed of sound SI UNITS
+%plot altitude vs. temperature
+figure(1)
+plot(temp_array, altitude)
+title('Figure 1 - Standard Atmosphere Density Model (SI)')
+xlabel('Temperature, T, K')
+ylabel('Altitude, h, km')
+
+figure(2)
+plot(pressure_array, altitude)
+title('Figure 2 - Standard Atmosphere Density Model (SI)')
+xlabel('Pressure, Pa, N/m^2')
+ylabel('Altitude, h, km')
+
+figure(3)
+plot(density_array, altitude)
+title('Figure 3 - Standard Atmosphere Density Model (SI)')
+xlabel('Density, rho, kg/m^3')
+ylabel('Altitude, h, km')
+
+figure(4)
+plot(sound_array, altitude)
+title('Figure 4 - Standard Atmosphere Speed of Sound Model (SI)')
+xlabel('Speed of Sound, v, m/s ')
+ylabel('Altitude, h, km')
+xlim([290 345])
+
+%plot altitude vs. temp, pressure, density and speed of sound ENGLISH UNITS
+figure(5)
+plot(temp_array, altitude_english)
+title('Figure 5 - Standard Atmosphere Temperature Model (ENGLISH)')
+xlabel('Temperature, T, R')
+ylabel('Altitude, h, ft')
+
+figure(6)
+plot(pressure_array_english, altitude_english)
+title('Figure 6 - Standard Atmosphere Pressure Model(ENGLISH)')
+xlabel('Pressure, p, lb/ft^2')
+ylabel('Altitude, h, ft')
+
+figure(7)
+plot(density_array_english, altitude_english)
+title('Figure 7 - Standard Atmosphere Density Model (ENGLISH)')
+xlabel('Density, theda, slugs/ft^3')
+ylabel('Altitude, h, ft')
+
+figure(8)
+plot(sound_array_english, altitude_english)
+title('Figure 8 - Standard Atmosphere Speed of Sound Model (ENGLISH)')
+xlabel('Speed of Sound, v, ft/s')
+ylabel('Altitude, h, ft')
