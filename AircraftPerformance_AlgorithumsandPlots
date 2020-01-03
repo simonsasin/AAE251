@@ -1,0 +1,348 @@
+%QUESTION 1%
+%velocity range for jet aircraft for entire range of V
+V_array = 50:1:250;
+thrust = Thrust_SLUF_CS_JET(V_array);
+power = Power_SLUF_CS_JET(V_array);
+%plot and formatting for power for GA aircraft
+figure
+plot(V_array, thrust)
+title(&#39;Thrust Required Curve for Jet Aircraft in SLUF&#39;)
+ylabel(&#39;Thrust Required (N)&#39;)
+xlabel(&#39;Airspeed (m/s)&#39;)
+%plot and formatting for power for jet
+figure
+plot(V_array, power)
+title(&#39;Power Required Curve for Jet Aircraft in SLUF&#39;)
+ylabel(&#39;Power Required (horsepower)&#39;)
+xlabel(&#39;Airspeed (m/s)&#39;)
+%calling SLUF power function for GA aircraft
+%velocity range for GA aircraft for entire range of V
+V_array = 20:1:150;
+power = Power_SLUF_CS_GA(V_array);
+thrust = Thrust_SLUF_CS_GA(V_array);
+%plot and formatting for power for GA aircraft
+figure
+plot(V_array, power)
+title(&#39;Power Required Curve for GA Aircraft in SLUF&#39;)
+ylabel(&#39;Power Required(Watts)&#39;)
+xlabel(&#39;Airspeed (m/s)&#39;)
+%plot and formatting for power for GA aircraft
+figure
+plot(V_array, thrust)
+title(&#39;Thrust Required Curve for GA aircraft in SLUF&#39;)
+ylabel(&#39;Thrust Required(N)&#39;)
+xlabel(&#39;Airspeed(m/s)&#39;)
+
+5
+
+Answer 1 (MATLAB Code):
+% FUNCTIONS USED:
+Thrust_SLUF_CS_JET
+function [thrust] = Thrust_SLUF_CS_JET(V)
+g = 9.81 %constant for gravity
+%calling SLUF thrust function for jet aircraft
+p = 1.2754; %kg/m^3 density at sea level
+S = 88.2; %m^2 jet Aircraft Wing Area
+Cd = 0.015; %Parasitic Drag for jet Aircraft
+K = 0.05; % k CONSTANT
+m = 33100; %kg mass of jet aircraft with full tank
+thrust = (.5.*p.*S.*(V.^2).*Cd) + (2.*K.*((m.*g)^2./(p.*S.*V.^2)));
+end
+Power_SLUF_CS_JET
+function [power] = Power_SLUF_CS_JET(V)
+%this function is used to find power required for jet aircraft from case
+%study
+%constants from case study for Jet aircraft from case study
+g = 9.81; %gravity constant
+p = 1.2754; %kg/m^3 density at sea level
+S = 88.2; %m^2 JET Aircraft Wing Area from case study
+Cd = 0.015; %Parasitic Drag for jet Aircraft
+K = 0.05; % K constant for jet aircraft
+m = 33100; %kg mass of aircraft with full tank
+power = ((.5.*p.*S.*(V.^3).*Cd) + (2.*K.*((m.*g)^2./(p.*S.*V))))/550;
+%outputs in horsepower
+end
+Power_SLUF_CS_GA
+function [power] = Power_SLUF_CS_GA(V)
+%this function is used to find power required for turboprop aircraft
+%constants from case study for GA aircraft
+g = 9.81; %gravity constant
+p = 1.2754; %kg/m^3 density at sea level
+S = 16.3; %m^2 GA Aircraft Wing Area
+Cd = 0.026; %Parasitic Drag for GA Aircraft
+K = 0.054; % K CONSTANT
+m = 1315; %kg mass of aircraft with full tank
+power = (.5.*p.*S.*(V.^3).*Cd) + (2.*K.*((m.*g)^2./(p.*S.*V)));
+end
+Thrust_SLUF_CS_GA
+function [thrust] = Thrust_SLUF_CS_GA(V)
+g = 9.81; %constant for gravity
+%calling SLUF thrust function for jet aircraft
+p = 1.2754; %kg/m^3 density at sea level
+S = 16.3; %m^2 jet Aircraft Wing Area
+Cd = 0.026; %Parasitic Drag for jet Aircraft
+K = 0.054; % k CONSTANT
+m = 1315; %kg mass of jet aircraft with full tank
+thrust = (.5.*p.*S.*(V.^2).*Cd) + (2.*K.*((m.*g)^2./(p.*S.*V.^2)));
+end
+
+%QUESTION 3%
+%Part a%
+p = .002377; %10^-4 slugs/ft^3 (lbs/ft^3)density at sea level
+S = 505.6; %ft^2 A-10 Aircraft Wing Area
+Cd = 0.032; %Parasitic Drag for A-10 Aircraft
+ef = .87; %oswald efficiency factor
+A_R = 6.5; %AR of A-10
+m = 23105/32.2; %lbs weight of aircraft with full tank
+%velocity range for A-10 aircraft and power calculation for entire
+range of V
+V_array = 40:1:1000;
+power = Power_SLUF(p,S,Cd,m,ef,A_R,V_array); %this outputs power as
+horsepower instead of ftlb/s
+%plot and formatting
+figure
+plot(V_array, power)
+title(&#39;Veloicty vs. Power Required Curve for A-10 Aircraft in SLUF at
+Sea Level&#39;)
+ylabel(&#39;Power Required(horsepower)&#39;)
+xlabel(&#39;Velocity (ft/s)&#39;)
+%Calculate maximum velocity that can be achieved at sea level at max
+%thrust%
+static_thrust = 18070; %static thrust of engines added together
+power_a = V_array.*static_thrust./550; %linear relationship for power
+available in horsepower
+%Plot comparing power available line to power required line
+%point of intersection is location of max velocity
+figure(1)
+subplot(1,2,1)
+plot(V_array, power)
+hold on
+plot(V_array, power_a)
+title(&#39;Velocity vs. Power Available and Power Required at Sea Level&#39;)
+legend(&#39;Power Required&#39;,&#39;Power Available&#39;)
+xlabel(&#39;Velocity (ft/s)&#39;)
+ylabel(&#39;Power (horsepower)&#39;)
+%Part C - Plot the power required at 5 km above sea level as a
+function of velocity
+p_o = .0014283; %10^-4 slugs/ft^3 (lbs/ft^3)density at 5 km
+p = .002377; %air density at sea level
+S = 505.6; %ft^2 A-10 Aircraft Wing Area
+Cd = 0.026; %Parasitic Drag for A-10 Aircraft
+e = .87;
+A_R = 6.5; %Finding K using given e=.87
+m = 23105/32.2; %lbs weight of aircraft with full tank
+
+13
+
+Answer 3 (MATLAB Code):
+%velocity range for GA aircraft and power calculation for entire range
+of V
+V_array = 40:1:1000;
+power_ralt = Power_SLUF(p,S,Cd,m,ef,A_R,V_array).*((p_o/p)^(.5));
+%plot and formatting
+figure
+plot(V_array, power_ralt)
+title(&#39;Power Required at 5km Curve for A-10 Aircraft in SLUF&#39;)
+ylabel(&#39;Power Required(horsepower)&#39;)
+xlabel(&#39;Velocity (ft/s)&#39;)
+%Calculate maximum velocity that can be achieved at sea level at max
+%thrust%
+static_thrust = 18070; %static thrust of engines added together
+power_aalt = V_array.*(static_thrust.*(p_o/p))./550; %linear
+relationship for power available in horsepower
+%Plot comparing power available line to power required line
+%point of intersection is location of max velocity
+figure(1)
+subplot(1,2,2)
+plot(V_array, power_ralt)
+hold on
+plot(V_array, power_aalt)
+title(&#39;Velocity vs. Power Available and Power Required at 5 km&#39;)
+legend(&#39;Power Required&#39;,&#39;Power Available&#39;)
+xlabel(&#39;Velocity (ft/s)&#39;)
+ylabel(&#39;Power (horsepower)&#39;)
+%answer for max velocity
+
+%FUNCTIONS USED:
+Power_SLUF
+function [power] = Power_SLUF(p,S,Cd,m,ef,A_R,V)
+%this function is used to find power required for
+turboprop aircraft
+%constants
+%g = 9.81; %gravity constant for metric
+g = 32.2; %gravity for imperial
+power = (0.5.*p.*S.*V.^3.*Cd)
++(2.*(1./(3.14.*ef.*A_R)).*((m.*g).^2./(p.*S.*V)));
+power = power./550;
+%convert to horsepower by dividing by 550 when needed
+%convert g to g=32.2 when using imperial as needed
+end
+
+%PROBLEM 5 SCRIPT - FUNCTION CALLS%
+%make array of range of altitudes from 0-32 km
+alt_max = 32; %range in inrcrements of altitude
+p_array = standard_atm(alt_max);
+%input range of densities into min Power function for prop
+power_min_array = power_min_prop(p_array);
+%constants for Case Study for GA aircraft
+p_o = 1.225; %kg/m^3
+m_ad = 0.6; %air density exponent
+density_ratio = (p_array./p_o).^m_ad;
+%from case study, Po max is = 216000 watts
+po_max = 216000;
+%calculation of available power
+power_a = density_ratio.*po_max;
+%formatting of final plot with all plot elements
+figure
+plot(1:alt_max,power_min_array)
+hold on
+plot(1:alt_max,power_a)
+title(&#39;Altitude vs. Minimum Power Required and Power Available for GA
+Aircraft&#39;)
+xlabel(&#39;Altitude (km)&#39;)
+ylabel(&#39;Power (Watts)&#39;)
+legend(&#39;Minimum Power Required&#39;,&#39;Power Available&#39;)
+
+20
+
+Answer 5 (Code):
+FUNCTIONS CALLED:
+standard_atm
+function [p] = standard_atm(alt_current)
+altitude = zeros(32,1);
+altitude_initial = 0;
+%create array to store all altitude data
+for count = 2:32
+altitude(count) = altitude_initial + 1;
+altitude_initial = altitude(count);
+end
+%altitude vs. temperature plot macro
+temp_array = zeros(32,1);
+%temperature calculation for gradient layer
+temp_sealevel = 288.16; %kelvin at sea level
+a_1 = -6.5; %lapse rate for gradient layer (K/km)
+for gradient = 1:12
+temp_gradient = altitude(gradient)*a_1 + temp_sealevel;
+temp_array(gradient) = temp_gradient;
+end
+%temperature calculation for isothermal layer
+temp_constant_isothermal = temp_array(12); %constant temp in isothermal
+layer
+for isothermal = 12:26
+temp_array(isothermal) = temp_constant_isothermal;
+end
+%temperature calculation for 2nd gradient region
+a_2 = 3; %K/km constant for calculation
+temp_initial = temp_array(26);
+h_initial = altitude(26); %km for initial height
+for gradient_2 = 26:32
+temp_gradient_2 = (altitude(gradient_2) - h_initial)*a_2 +
+temp_initial;;
+temp_array(gradient_2) = temp_gradient_2;
+end
+%altitude versus pressure macro
+pressure_array = zeros(32,1);
+%pressure calculation for first gradient region
+P_initial = 101325; %N/m^2 constant use for pressure at sea level
+g_o = 9.81; %m/s^2 constant for gravity
+R = 287; %J/kg*K gas constant
+temp_sealevel = 288.16; %kelvin at sea level
+
+21
+
+a_1 = -.0065; %K/m constant for temperature gradient
+for count = 1:12
+pressure = (((temp_array(count))/temp_sealevel)^(-
+g_o/(a_1*R)))*P_initial;
+pressure_array(count) = pressure;
+end
+%pressure calculation for isothermal layer
+P_initial = pressure_array(12); %N/m^2 pressure used from last
+calculation
+g_o = 9.81; %m/s^2 constant for gravity
+R = 287; %J/kg*K gas constant
+temp_constant_isothermal = 216.66; %kelvin constant
+altitude_initial = 11000; %meters for initial altitude
+for count = 12:26
+pressure = P_initial*exp(-
+1*((g_o/(R*temp_array(count)))*((altitude(count)*1000)-
+altitude_initial)));
+pressure_array(count) = pressure;
+end
+%pressure calculation for second gradient layer
+for count = 26:32
+pressure = 5474.889 * [216.65/(216.65 + (altitude(count) -
+20))]^34.1632;
+pressure_array(count) = pressure;
+end
+% altitude vs. density macro
+density_array = zeros(32,1); %establish array to store density values
+%density calculations for gradient layer
+rho_initial = 1.2250; %kg/m^3 constant use for density at sea level
+g_o = 9.81; %m/s^2 constant for gravity
+R = 287; %J/kg*K gas constant
+temp_sealevel = 288.16; %kelvin at sea level
+a_1 = -.0065; %K/m constant for temperature gradient
+for count = 1:12
+density = ((temp_array(count))/temp_sealevel)^(-
+1*(((g_o/(a_1*R))+1)))*rho_initial;
+density_array(count) = density;
+end
+%density calculations for isothermal layer
+rho_initial = density_array(12); %kg/m^3 constant use for density at
+sea level
+g_o = 9.81; %m/s^2 constant for gravity
+R = 287; %J/kg*K gas constant
+temp_initial = temp_array(12); %initial temp for beginning of
+isothermal layer
+altitude_initial = 11000; %initial altitude for isothermal layer
+for count = 12:26
+
+22
+
+density = (rho_initial)*exp(-
+1*(g_o/(R*temp_array(count)))*((altitude(count)*1000) -
+altitude_initial));
+density_array(count) = density;
+end
+%density calculations for second gradient layer
+rho_initial = density_array(26); %kg/m^3 constant use for density at
+sea level
+g_o = 9.81; %m/s^2 constant for gravity
+R = 287; %J/kg*K gas constant
+temp_initial = temp_array(26); %kelvin at sea level
+a_2 = -.003; %K/m constant for temperature gradient
+pressure_initial = pressure_array(26);
+for count = 26:32
+density = (pressure_array(count)/pressure_initial)*rho_initial;
+density_array(count) = density;
+end
+%calculation for speed of sound at each altitude
+R = 287; %J/kg*K gas constant
+y = 1.4; %bolztmann constant air at STP
+sound_array = zeros(32,1);
+for count = 1:32
+speed_sound = nthroot((y*R*temp_array(count)),2);
+sound_array(count) = speed_sound;
+end
+%code for plotting all graphs
+%convert all metric units to english units for conversion
+altitude_english = arrayfun(@(x) x*3280.8399,altitude);
+density_array_english = arrayfun(@(x) x*.00194032033,density_array);
+pressure_array_english = arrayfun(@(x) x*.020885,pressure_array);
+sound_array_english = arrayfun(@(x) x*3.28084,sound_array);
+%USED FOR FUNCTION OUTPUT%
+p = density_array(1:alt_current,1);
+end
+power_min_prop
+function [power_min] = power_min_prop(p)
+%this function calculations minimum power required for SLUF flight
+m = 1315; %kg
+S = 16.3; %m^2
+g = 9.81; %gravity constant
+K = 0.054;
+Cd = .026;
+power_min = 4./3*sqrt((2.*(m.*g).^3)./(p.*S)*sqrt(3.*K.^3.*Cd));
+end
+
+
