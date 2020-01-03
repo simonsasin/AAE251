@@ -1,0 +1,114 @@
+%initialization of 4 digit NACA airfoil code
+code = zeros(4,0)
+%for loop to iterate through each digit
+for count = 1:4
+digit = input('Enter Digit of NACA Series Code(one digit at a
+time): ')
+code(count) = digit;
+end
+cl = 1;
+cl_2 = input('Enter chord length of Airfoil(m): ')
+%calculation for airfoil leading edge
+le = (code(2)/10)*cl;
+%calculation of positon of maximum camber
+mc = (code(1)/100)*cl;
+%computing of mean camber line
+x = 0;
+meancl_y = zeros(1000,0);
+dy_c_all = zeros(1000,0);
+count = 1;
+%coniditional statement accounting for symmetric airfoil
+if code(1) == 0
+x = cl*2;
+end
+%while loop accounting for cambered airfoil mean camber line
+while x <= (cl+.05)
+if x <= mc
+y_c = (mc/le^2)*((2*mc*x)-x^2);
+dy_c = 2*mc/le^2*(le-x);
+else
+y_c = (mc/(1-le)^2)*((1-2*le)+(2*le*x)-x^2);
+dy_c = (mc/(1-le)^2)*(1-2*x);
+end
+meancl_y(count) = y_c;
+dy_c_all(count) = dy_c;
+count = count + 1;
+x = x + .05;
+end
+%maximum airfoil thickness coordinates (in tenths of a chord)
+calc_1 = code(3)*10;
+calc_2 = code(4);
+t = (calc_1 + calc_2)/100;
+%calculate thickness distribution (above and below mean camber
+
+27
+
+line)
+x = 0;
+count = 1;
+thick_d = zeros(1000,0);
+while x <= (cl+.05)
+y_t = (t/.2)*(.2969*sqrt(x)-.1260*x-.3516*x^2+.2843*x^3-
+.1015*x^4)
+thick_d(count) = y_t
+count = count + 1
+x = x + .05
+end
+%calculating final coordinates for upper/lower airfoil surface
+x_u_array = zeros(1000,0);
+y_u_array = zeros(1000,0);
+x_l_array = zeros(1000,0);
+y_l_array = zeros(1000,0);
+x = 0;
+count = 1;
+%while loop calculate upper and lower coordinates of airfoil
+if code(1) > 0
+while x <= (cl+.05);
+theda = atan(dy_c_all(count));
+x_u = x - thick_d(count)*sin(theda);
+y_u = meancl_y(count) + thick_d(count)*cos(theda);
+x_l = x + thick_d(count)*sin(theda);
+y_l = meancl_y(count) - thick_d(count)*cos(theda);;
+x_u_array(count) = x_u;
+y_u_array(count) = y_u;
+x_l_array(count) = x_l;
+y_l_array(count) = y_l;
+x = x + .05;
+count = count + 1;
+end
+else
+x_u_array = [0:.05:cl];
+x_l_array = [0:.05:cl];
+y_u_array = thick_d;
+y_l_array = -1*thick_d;
+end
+%smooth out curves to make airfoil have smooth curves
+smoothyu = smooth(y_u_array);
+smoothyl = smooth(y_l_array);
+smoothmcl = smooth(meancl_y);
+x = [0:.05:cl];
+y = zeros(1,length(x));
+%plots for airfoil and mean camber line
+
+28
+
+figure
+plot(x_u_array,smoothyu,'r')
+hold on
+plot(x_l_array,smoothyl,'r')
+hold on
+plot(x,y,'--b')
+hold on
+if code(1) > 0
+plot(x,smoothmcl,'-')
+legend('Upper Chord','Lower Chord','Mean Camber Line','Chord
+Line')
+else
+legend('Upper Chord','Lower Chord','Chord Line')
+end
+hold on
+grid on
+title('NACA 0006 Airfoil')
+xlabel('Chord Length(m)')
+ylabel('Thickness of Airfoil(m)')
+axis equal
